@@ -1,0 +1,46 @@
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+
+contract MyNFT is ERC721URIStorage, Ownable {
+    string public nameNFT;
+    string public nameSymbol;
+    string public nftTokenURI;
+    uint256 public nftId;
+
+    mapping(uint256 => string) public tokenURIExists;
+    mapping(uint256 => uint256) public tokenIdToValue;
+
+    constructor() ERC721("THOMAS_NFT", "TKN") {
+        nameNFT = "THOMAS_NFT";
+        nameSymbol = "TKN";
+    }
+
+    function Mint(string memory _tokenURI, uint256 _nftPrice)
+        public
+        returns (uint256)
+    {
+        require(msg.sender != address(0));
+        nftTokenURI = _tokenURI;
+        nftId++;
+        require(!_exists(nftId));
+        tokenIdToValue[nftId] = _nftPrice;
+        _mint(msg.sender, nftId);
+        _setTokenURI(nftId, nftTokenURI);
+
+        return nftId;
+    }
+
+    function tokenPrice(uint256 _tokenID)
+        public
+        view
+        returns (uint256 nftPrice)
+    {
+        require(!_exists(nftId));
+        nftPrice = tokenIdToValue[_tokenID];
+    }
+}
